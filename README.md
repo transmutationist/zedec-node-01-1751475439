@@ -99,6 +99,9 @@ This project fuses classical, quantum, and harmonic computation with perpetual a
 6. **Join community channels and QuantumCovenant governance.**
 7. **Document all code, logic, and expansions for perpetual audit and evolution.**
 
+## 🎛 Demo Interface
+
+Open `index.html` in a browser to see a simple React interface that displays the ZEDEC initialization sequence. Click **Invoke Harmonic Sequence** to view the launch and deploy images.
 ---
 
 ## 📚 Further Reading & References
