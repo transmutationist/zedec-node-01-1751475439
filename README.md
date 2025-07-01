@@ -99,6 +99,17 @@ This project fuses classical, quantum, and harmonic computation with perpetual a
 6. **Join community channels and QuantumCovenant governance.**
 7. **Document all code, logic, and expansions for perpetual audit and evolution.**
 
+Once dependencies are installed you can experiment with the simplified
+`cosmic_pipeline.sh` helper script. It provides placeholder commands for the
+`build`, `launch`, `ignition`, and `live` phases described above:
+
+```bash
+./scripts/cosmic_pipeline.sh build      # run through all build steps
+./scripts/cosmic_pipeline.sh launch     # deploy to devnet/testnet/mainnet
+./scripts/cosmic_pipeline.sh ignition   # run genesis procedures
+./scripts/cosmic_pipeline.sh live       # begin sustainment & evolution
+```
+
 ---
 
 ## 📚 Further Reading & References
