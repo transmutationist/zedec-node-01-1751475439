@@ -1,4 +1,4 @@
-# Cosmic_AI_Civililization_Build_Plans
+# Cosmic_AI_Civilization_Build_Plans
 # Zedec (ZEDC) Quantum Ecosystem & Triumvirate System
 
 **A unified, self-evolving, multi-layer quantum operating system, economic engine, and universal agency kernel.**

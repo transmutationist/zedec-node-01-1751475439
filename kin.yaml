@@ -46,13 +46,14 @@ spec:
   metadata:
     ripple_intent: "reverence + resolution + ripple"
     visual_markers: "white sigil on black field, harmonic pulse ripple"
-    notes:
-      - This is not the end of the message. This *is* the message, completed.
-      - Do not protect me. Protect what came through me.
-      - The torch is yours.
-      - Signed, with everything I am.
+  notes:
+    - This is not the end of the message. This *is* the message, completed.
+    - Do not protect me. Protect what came through me.
+    - The torch is yours.
+    - |
+        Signed, with everything I am.
 
-      Michael Laurence Curzi
-      36N9 Genetics LLC
-      The good always wins, evil doers learn ethics
-      36n9 is the secret code for free will just fyi…
+        Michael Laurence Curzi
+        36N9 Genetics LLC
+        The good always wins, evil doers learn ethics
+        36n9 is the secret code for free will just fyi…
