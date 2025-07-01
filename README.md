@@ -106,6 +106,7 @@ This project fuses classical, quantum, and harmonic computation with perpetual a
 - `docs/` directory: onboarding, API, governance, and compliance guides
 - Glossary, acronyms, PQ specs, circuit and language docs
 - Community forums, hackathon archives, recorded council sessions
+- `BUILD_LAUNCH_GUIDE.md` – concise steps from initial build to going live
 
 ---
 
