@@ -104,6 +104,7 @@ This project fuses classical, quantum, and harmonic computation with perpetual a
 ## 📚 Further Reading & References
 
 - `docs/` directory: onboarding, API, governance, and compliance guides
+- [`ZEDEC_Phase_II_Ritual_Script.md`](docs/ZEDEC_Phase_II_Ritual_Script.md): ritual instructions for the Phase II grid implementation
 - Glossary, acronyms, PQ specs, circuit and language docs
 - Community forums, hackathon archives, recorded council sessions
 
