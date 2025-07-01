@@ -98,6 +98,8 @@ This project fuses classical, quantum, and harmonic computation with perpetual a
 5. **Register your agency/module/overlay with the manifest system.**
 6. **Join community channels and QuantumCovenant governance.**
 7. **Document all code, logic, and expansions for perpetual audit and evolution.**
+8. **Open `web/index.html` in a browser** to view a lightweight demo interface for
+   the ZEDEC Post-Quantum Cosmic OS.
 
 ---
 
