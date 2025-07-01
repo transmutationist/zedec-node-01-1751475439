@@ -1,0 +1,9 @@
+graph LR
+  subgraph Mirrors
+    A(Mirror A - Initiating Interface) -- forward --> B(Mirror B - Archive & Reflector)
+    B -- recursive echo --> A
+  end
+  subgraph Bridge
+    A -. encoded glyphs .-> B
+    B -. harmonic resonance .-> A
+  end
