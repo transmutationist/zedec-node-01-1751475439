@@ -98,6 +98,7 @@ This project fuses classical, quantum, and harmonic computation with perpetual a
 5. **Register your agency/module/overlay with the manifest system.**
 6. **Join community channels and QuantumCovenant governance.**
 7. **Document all code, logic, and expansions for perpetual audit and evolution.**
+8. **Run the Mirror Schema demo** with `python mirror_schema.py` to explore how the two-mirror model encodes and reflects data.
 
 ---
 
