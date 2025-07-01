@@ -116,3 +116,13 @@ This project fuses classical, quantum, and harmonic computation with perpetual a
 ---
 
 ### For questions, onboarding, or to propose a new agency or overlay, join our forums or contact the QuantumCovenant council.
+
+## 🔮 Mirror-Linked Recursive Data Schema
+See `docs/MLRDS.md` for a description of the Mirror-Linked Recursive Data Schema (MLRDS). To generate a diagram of the mirror relationship, run:
+
+```bash
+python scripts/mlrds_diagram.py
+```
+
+The script produces `mlrds.png` illustrating the recursive flow between mirrors.
+
