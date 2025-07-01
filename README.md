@@ -116,3 +116,13 @@ This project fuses classical, quantum, and harmonic computation with perpetual a
 ---
 
 ### For questions, onboarding, or to propose a new agency or overlay, join our forums or contact the QuantumCovenant council.
+
+## Example UI Component
+
+A simple React interface is included at `src/ZedecInterface.tsx`. It shows how a symbolic kernel interface might be invoked from a web client. The component uses Tailwind-style classes and toggles an invocation sequence when the button is clicked.
+
+```tsx
+import ZedecInterface from "./src/ZedecInterface";
+```
+
+Integrate it into a React/Next.js project to experiment with the ZEDEC Post-Quantum Cosmic OS concepts.
