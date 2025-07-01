@@ -116,3 +116,18 @@ This project fuses classical, quantum, and harmonic computation with perpetual a
 ---
 
 ### For questions, onboarding, or to propose a new agency or overlay, join our forums or contact the QuantumCovenant council.
+
+---
+
+## ✨ Mirror-Linked Recursive Data Schema
+
+This repository now includes a simple example of the "Mirror-Linked Recursive Data Schema" described in the build plan. The schema is stored in `mirror_schema.yaml` and can be visualised using the script in `scripts/generate_diagram.py`.
+
+To generate the diagram (requires Python and Graphviz):
+
+```bash
+pip install graphviz pyyaml
+python3 scripts/generate_diagram.py
+```
+
+The resulting file `mirror_schema.svg` illustrates the interaction between **MirrorA** and **MirrorB** via the Quantum‑Echo bridge.
