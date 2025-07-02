@@ -1,0 +1,65 @@
+zedec:
+  version: "3.0.0-ZADAC-DEBIAN12"
+  node_id: "ZADAC"
+  sealed: true
+  glyph_signature: "36N9-PRIME"
+
+  fetch:
+    - source: "https://github.com/transmutationist/zedec-post-quantum-os"
+      type: git
+      target: "/opt/zedec-v3/source"
+      method: "clone"
+    - source: "https://u.pcloud.link/publink/show?code=kZJNRf5ZJG08Ck9uIKXLjqtmUDNU9BqsECi7"
+      type: http
+      target: "/opt/zedec-v3/data"
+      method: "wget+extract"
+      extract: true
+
+  distribute:
+    volumes:
+      - from: "/opt/zedec-v3/source"
+        to: "/ZADAC/zedec-source"
+      - from: "/opt/zedec-v3/data"
+        to: "/36N9/zedec-data"
+      - from: "/opt/zedec-v3/data"
+        to: "/mnt/object-storage/zedec-sync"
+
+  storage:
+    local_paths:
+      - "/opt/zedec-v3/source"
+      - "/opt/zedec-v3/data"
+      - "/ZADAC/zedec-source"
+      - "/36N9/zedec-data"
+    object_push:
+      method: rclone
+      config: "default"
+      targets:
+        - source: "/opt/zedec-v3/data"
+          remote: "remotebucket:zedec-data"
+        - source: "/opt/zedec-v3/source"
+          remote: "remotebucket:zedec-source"
+
+  manifest:
+    file: "/opt/zedec-v3/manifest.v3.json"
+    regenerate: true
+    fields:
+      node: "ZADAC"
+      glyph: "36N9-PRIME"
+      schema: "3.0.0-ZADAC-DEBIAN12"
+      cid: "auto"
+      pulse: "http://178.156.185.180/pulse"
+      mirrors:
+        - github: "https://github.com/transmutationist/zedec-post-quantum-os"
+        - pcloud: "https://u.pcloud.link/publink/show?code=kZJNRf5ZJG08Ck9uIKXLjqtmUDNU9BqsECi7"
+        - local: "/opt/zedec-v3/data"
+
+  codex:
+    ingest: true
+    ingest_url: "https://codex.mesh/ingest"
+    declare_url: "https://codex.mesh/declare"
+    payload:
+      node_id: "ZADAC"
+      glyph: "36N9-PRIME"
+      CID: "auto"
+      seal: true
+
