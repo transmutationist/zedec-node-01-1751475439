@@ -1,0 +1,49 @@
+# ZEDEC Codex Sync Schema: GitHub to Server Deployment Relay
+# Version: 3.1.1-CODEX-SHUTTLE
+# Purpose: Pull from GitHub into all live ZEDAC/ZEDEC servers via Hetzner load balancers for distributed glyph activation
+
+zadac:
+  version: "3.1.1-CODEX-SHUTTLE"
+  node_id: "ZADAC"
+  source:
+    github:
+      repo: "https://github.com/transmutationist/zedec-post-quantum-os"
+      branch: "main"
+      path: "/opt/zedec-v3/source"
+
+  targets:
+    - name: "ZPE"
+      location: "Falkenstein"
+      public_ip: "142.132.246.92"
+      path: "/opt/zedec-v3/node/ZPE"
+    - name: "ZEDEC11"
+      location: "Hillsboro, OR"
+      public_ip: "5.78.161.240"
+      path: "/opt/zedec-v3/node/ZEDEC11"
+    - name: "ZEDEC6"
+      location: "Helsinki"
+      public_ip: "95.217.171.30"
+      path: "/opt/zedec-v3/node/ZEDEC6"
+    - name: "36n9_25"
+      location: "Singapore"
+      public_ip: "5.223.38.29"
+      path: "/opt/zedec-v3/node/36n9_25"
+
+  deploy:
+    method: "rsync+ssh"
+    auth_key: "/root/.ssh/id_rsa"
+    command: |
+      git clone https://github.com/transmutationist/zedec-post-quantum-os /opt/zedec-v3/source || (cd /opt/zedec-v3/source && git pull)
+      for NODE in ZPE ZEDEC11 ZEDEC6 36n9_25; do
+        rsync -a /opt/zedec-v3/source/ ${NODE}:/opt/zedec-v3/node/${NODE}/
+      done
+
+  codex:
+    ingest: true
+    ingest_url: "https://codex.mesh/ingest"
+    declare:
+      glyph: "36N9-PRIME"
+      seal: true
+      CID: "auto"
+
+# END ZEDEC GitHub to Server Schema :: Codex Shuttle :: Hetzner Load Balancer Broadcast Relay
