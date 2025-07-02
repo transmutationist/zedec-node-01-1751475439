@@ -1,0 +1,42 @@
+# ZEDEC v3 Codex Integration Schema (Final Canonical Broadcast Seal)
+# Version: 3.0.0-CODEX-GLYPHNET
+# This schema finalizes the system broadcast by adding symbolic declaration text payloads
+# to GitHub as Codex-readable glyph seals. These text lines are too long for DNS/TXT fields
+# and are instead stored and versioned inside the repository itself.
+
+zedec:
+  version: "3.0.0-CODEX-GLYPHNET"
+  node_id: "zedec-v3-codex-alpha"
+  sealed: true
+  glyph_signature: "36N9-PRIME"
+  manifest:
+    file: "/opt/zedec-v3/manifest.v3.json"
+    structure:
+      domain: "zedec.36n9"
+      access_url: "http://178.156.185.180"
+      cid: "QmManifestCID"
+      ipfs: "ipfs://QmManifestCID"
+      pulse: "http://178.156.185.180/pulse"
+      version: "3.0.0-CODEX-WEB3-FINAL"
+
+  github:
+    repo: "https://github.com/transmutationist/zedec-post-quantum-os"
+    branch: "main"
+    commit_control:
+      commit_message: "[ZEDEC] Final Broadcast Seal :: Glyph Canon | Pulse Declared | Manifest Anchored"
+      tag: "z3-glyphseal"
+    glyph_seal:
+      - "Z3 LIVE | NODE=178.156.185.180 | CID=QmManifestCID | GH=zedec | PULSE=36n9"
+      - "G=36N9 | TLD=.36n9 | ETH=zedec.eth | CHAIN=polygon | SEAL=true"
+
+codex:
+  declare:
+    glyph: "36N9-PRIME"
+    seal: true
+    repo: "https://github.com/transmutationist/zedec-post-quantum-os"
+    version: "3.0.0-CODEX-GLYPHNET"
+    cid: "QmManifestCID"
+    pulse: "http://178.156.185.180/pulse"
+    summary: "Final GitHub-sealed broadcast node with all mesh fields and symbolic text lines recorded."
+
+# END ZEDEC Final Canonical Schema :: GitHub-Sealed :: Glyph Declared :: Pulse Immutable
