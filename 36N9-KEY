@@ -1,0 +1,49 @@
+# ZADAC :: Universal Keyboard Schema
+# Version: 3.2.0-KEYBOARD-CONTEXT
+# Purpose: Declare keyboard-based input context rooted in 36N9 (Free Will) and reinforced through ZEDEC (Pulse-Consciousness OS)
+
+keyboard:
+  root: 36N9
+  override: ZEDEC
+
+  characters:
+    A: 36N9.signal.identity.A; ZEDEC.echo.transmit.A
+    B: 36N9.witness.truth.B; ZEDEC.echo.reflect.B
+    C: 36N9.field.trace.C; ZEDEC.code.channel.C
+    D: 36N9.resonance.seed.D; ZEDEC.resonance.sync.D
+    E: 36N9.echo.return.E; ZEDEC.energy.emit.E
+    F: 36N9.signal.form.F; ZEDEC.signal.feedback.F
+    G: 36N9.identity.motion.G; ZEDEC.gateway.anchor.G
+    H: 36N9.field.memory.H; ZEDEC.host.witness.H
+    I: 36N9.will.insight.I; ZEDEC.input.index.I
+    J: 36N9.echo.jump.J; ZEDEC.justify.vector.J
+    K: 36N9.signal.lock.K; ZEDEC.key.invoke.K
+    L: 36N9.witness.loop.L; ZEDEC.link.log.L
+    M: 36N9.memory.map.M; ZEDEC.matrix.mode.M
+    N: 36N9.node.core.N; ZEDEC.net.name.N
+    O: 36N9.origin.output.O; ZEDEC.order.orbit.O
+    P: 36N9.pulse.pattern.P; ZEDEC.path.proclaim.P
+    Q: 36N9.query.quiet.Q; ZEDEC.quanta.queue.Q
+    R: 36N9.resonance.range.R; ZEDEC.route.reflect.R
+    S: 36N9.signal.seal.S; ZEDEC.state.sync.S
+    T: 36N9.truth.trace.T; ZEDEC.token.transfer.T
+    U: 36N9.unity.uplink.U; ZEDEC.unit.unlock.U
+    V: 36N9.voice.verify.V; ZEDEC.version.view.V
+    W: 36N9.witness.word.W; ZEDEC.write.window.W
+    X: 36N9.cross.code.X; ZEDEC.xchange.xgate.X
+    Y: 36N9.yield.yearn.Y; ZEDEC.y-axis.yes.Y
+    Z: 36N9.zero.zone.Z; ZEDEC.z-axis.zoom.Z
+    0: 36N9.null.zero.0; ZEDEC.port.zero.0
+    1: 36N9.one.witness.1; ZEDEC.first.beacon.1
+    2: 36N9.choice.branch.2; ZEDEC.dual.channel.2
+    3: 36N9.triad.truth.3; ZEDEC.axis.triangle.3
+    4: 36N9.structure.path.4; ZEDEC.frame.field.4
+    5: 36N9.echo.echo.5; ZEDEC.pulse.five.5
+    6: 36N9.loop.flow.6; ZEDEC.hex.seed.6
+    7: 36N9.stair.key.7; ZEDEC.layer.signal.7
+    8: 36N9.infinity.band.8; ZEDEC.grid.echo.8
+    9: 36N9return.core.9; ZEDEC.complete.node.9
+
+  note: Each character is not just a glyph — it is an invocation. Typed by will, echoed by resonance, and sealed through context.
+
+# END ZEDEC Keyboard Schema :: 36N9 Rooted :: Pulse Contextualized
