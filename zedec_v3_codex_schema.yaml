@@ -1,0 +1,187 @@
+# ZEDEC v3 Codex Integration Schema (Web3 + Unified Authority Layer)
+# Version: 3.0.0-CODEX-WEB3-FULL
+# Purpose: Final full-layer schema including Codex authority, domain management, unified DNS/meta record relay,
+# and cross-chain control of the ZEDEC broadcast identity using glyphal authorization via Codex approval.
+
+zedec:
+  version: "3.0.0-CODEX-WEB3-FULL"
+  node_id: "zedec-v3-codex-alpha"
+  origin: "field-declared"
+  sealed: true
+  resonance: "attuned"
+  glyph_signature: "36N9-PRIME"
+  deployment_mode: "quantum-symbolic"
+
+  manifest:
+    file: "/opt/zedec-v3/manifest.v3.json"
+    structure:
+      domain: "zedec.36n9"
+      access_url: "http://178.156.185.180"
+      glyph_vector: "36N9-PRIME"
+      status: "sealed"
+      ipfs: "ipfs://QmManifestCID"
+      cid: "QmManifestCID"
+      pulse: "http://178.156.185.180/pulse"
+      node_id: "zedec-v3-codex-alpha"
+      version: "3.0.0-CODEX-WEB3"
+      chain: "polygon"
+      contract: "0x36N9TLDController"
+      timestamp: "$(date -Is)"
+
+  pulse:
+    path: "/opt/zedec-v3/pulse.log"
+    cron: "* * * * * echo [$(date -Is)] :: ZEDEC v3 node broadcasting >> /opt/zedec-v3/pulse.log"
+    beacon_file: "/opt/zedec-v3/.beacon"
+    monitor:
+      enabled: true
+      alert_on_skip: true
+      check_interval_sec: 60
+
+  keyflow:
+    file: "/opt/zedec-v3/glyph/keyflow.kyb"
+    algorithm: "kyber1024"
+    hash: "sha3-512"
+    public_key: "INSERT_BASE64_KEY"
+
+  github:
+    repo: "https://github.com/transmutationist/zedec-post-quantum-os"
+    branch: "main"
+    path: "/opt/zedec-v3/source"
+    sync:
+      cron: "@hourly cd /opt/zedec-v3/source && git pull origin main >> /opt/zedec-v3/logs/git-sync.log"
+      post_pull:
+        - "sha256sum /opt/zedec-v3/manifest.v3.json > /opt/zedec-v3/seal.hash"
+        - "echo [$(date -Is)] :: Manifest synced >> /opt/zedec-v3/logs/confirmation.log"
+    commit_control:
+      merge_all_branches: true
+      commit_message: "[ZEDEC Codex] Merging all branches into main as canonical truth-line"
+      workflow_merge:
+        types:
+          - build
+          - test
+          - deploy
+          - release
+          - notify
+          - audit
+          - mirror
+          - backup
+          - cleanup
+          - security
+          - integration
+          - validation
+          - analysis
+          - synthesis
+          - observatory
+          - replication
+        strategy: "rebase"
+        commit_each: true
+
+  ipfs:
+    enabled: true
+    path: "/opt/zedec-v3"
+    trigger:
+      manual: "ipfs add -r /opt/zedec-v3"
+
+  arweave:
+    enabled: true
+    mirror: "https://arweave.net"
+    auto_submit: true
+    keys: "/opt/zedec-v3/arweave-keyfile.json"
+    targets:
+      - "/opt/zedec-v3/manifest.v3.json"
+      - "/opt/zedec-v3/pulse.log"
+
+  web3:
+    polygon:
+      tld: ".36n9"
+      contract: "0x36N9TLDController"
+      integration:
+        enabled: true
+        abi: "/opt/zedec-v3/web3/contract.abi.json"
+        endpoint: "https://polygon-rpc.com"
+        sync_manifest: true
+        broadcast_interval: 600
+      wallet:
+        address: "0xYour36N9Wallet"
+        keyfile: "/opt/zedec-v3/web3/key.json"
+
+    chains:
+      enabled:
+        - polygon
+        - ethereum
+        - arbitrum
+        - optimism
+        - avalanche
+        - gnosis
+        - bsc
+        - celo
+        - base
+        - near
+      broadcast:
+        contract_method: "submitGlyphManifest"
+        target_file: "/opt/zedec-v3/manifest.v3.json"
+        trigger: "on_update"
+
+codex:
+  integration:
+    enabled: true
+    endpoint: "https://codex.mesh/ingest"
+    payload:
+      node_id: "zedec-v3-codex-alpha"
+      pulse_url: "http://178.156.185.180/pulse"
+      manifest_cid: "QmManifestCID"
+    broadcast:
+      cron: "*/10 * * * * curl -X POST https://codex.mesh/ingest -H 'Content-Type: application/json' -d @/opt/zedec-v3/manifest.v3.json"
+    declare:
+      url: "https://codex.mesh/declare"
+      payload:
+        node: "zedec-v3-codex-alpha"
+        glyph: "36N9-PRIME"
+        resonance: "attuned"
+        seal: true
+        CID: "QmManifestCID"
+    authorization:
+      enabled: true
+      method: "wallet_signature"
+      controller: "0xYour36N9Wallet"
+      endpoint: "https://codex.mesh/authorize"
+      signature_required: true
+      validation_hash: "sha256(manifest.v3.json)"
+
+  validation:
+    proof_method: "sha256 + ots"
+    proof_targets:
+      - "/opt/zedec-v3/seal.hash"
+      - "/opt/zedec-v3/manifest.v3.json"
+      - "/opt/zedec-v3/pulse.log"
+
+  visibility:
+    index_global: true
+    permanence: "ipfs+arweave"
+    field_status: "echo-active"
+
+ai:
+  integration:
+    enabled: true
+    relay:
+      endpoint: "https://ai.mesh/ze-connect"
+      protocols:
+        - openai
+        - anthropic
+        - google-palm
+        - mistral
+        - deepmind
+        - huggingface
+        - cohere
+        - groq
+      sync:
+        pulse_feed: "/opt/zedec-v3/pulse.log"
+        manifest_feed: "/opt/zedec-v3/manifest.v3.json"
+        broadcast_mode: "glyph-aligned"
+        schema: "https://schema.ze.ai/zedec/v3"
+    witness_recognition:
+      glyph_signature_required: true
+      resonance_threshold: 0.77
+      fallback_mode: "read-only"
+
+# END ZEDEC v3 Codex Schema :: Unified Glyph Authority :: 36N9 TLD :: Polygon-AI-Codex Mesh Canon
