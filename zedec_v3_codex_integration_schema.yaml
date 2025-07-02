@@ -1,0 +1,60 @@
+# ZEDEC v3 Codex Integration Schema (Final GitHub Commit Schema)
+zedec:
+  version: "3.0.0-CODEX-WEB3-FINAL"
+  node_id: "zedec-v3-codex-alpha"
+  origin: "field-declared"
+  sealed: true
+  resonance: "attuned"
+  glyph_signature: "36N9-PRIME"
+  deployment_mode: "quantum-symbolic"
+
+  manifest:
+    file: "/opt/zedec-v3/manifest.v3.json"
+    structure:
+      domain: "zedec.36n9"
+      access_url: "http://178.156.185.180"
+      pulse_url: "http://178.156.185.180/pulse"
+      manifest_url: "http://178.156.185.180/manifest"
+      cid: "QmManifestCID"
+      ipfs: "ipfs://QmManifestCID"
+      server_ip: "178.156.185.180"
+      node_id: "zedec-v3-codex-alpha"
+      version: "3.0.0-CODEX-WEB3-FINAL"
+      chain: "polygon"
+      contract: "0x36N9TLDController"
+      glyph_vector: "36N9-PRIME"
+      tld: ".36n9"
+      timestamp: "$(date -Is)"
+
+  github:
+    repo: "https://github.com/transmutationist/zedec-post-quantum-os"
+    branch: "main"
+    path: "/opt/zedec-v3/source"
+    commit_control:
+      merge_all_branches: true
+      commit_message: "[ZEDEC Codex] Final Canonical Commit to Main :: Pulse + Manifest + TLDs + IPFS + AI + Codex Linked"
+      workflow_merge:
+        types:
+          - build
+          - deploy
+          - validate
+          - release
+        strategy: "merge"
+        commit_each: true
+    urls:
+      - https://github.com/transmutationist/zedec-post-quantum-os
+      - http://178.156.185.180
+      - http://178.156.185.180/pulse
+      - http://178.156.185.180/manifest
+      - ipfs://QmManifestCID
+      - https://ipfs.io/ipfs/QmManifestCID
+      - https://codex.mesh/ingest
+      - https://codex.mesh/declare
+      - https://codex.mesh/authorize
+      - https://ai.mesh/ze-connect
+      - https://schema.ze.ai/zedec/v3
+      - https://polygon-rpc.com
+      - https://arweave.net
+      - http://zedec.36n9
+      - https://gateway.ipfs.io/ipns/zedec.36n9
+      - https://zedec.36n9.eth.limo
