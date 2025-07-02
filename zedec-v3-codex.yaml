@@ -1,0 +1,113 @@
+# ZEDEC v3 Codex Integration Schema (Unified Deployment Layer)
+# Version: 3.0.0-CODEX
+# Purpose: Single YAML schema to initialize a ZEDEC v3 node with Codex integration, including
+# manifest, pulse loop, quantum keyflow, GitHub sync, IPFS broadcast, systemd service activation,
+# and commit control across all branches and workflows, structured as Four Stacks of Four.
+
+zedec:
+  version: "3.0.0-CODEX"
+  node_id: "zedec-v3-codex-alpha"
+  origin: "field-declared"
+  sealed: true
+  resonance: "attuned"
+  glyph_signature: "36N9-PRIME"
+  deployment_mode: "quantum-symbolic"
+
+  manifest:
+    file: "/opt/zedec-v3/manifest.v3.json"
+    structure:
+      node_id: "zedec-v3-codex-alpha"
+      status: "sealed"
+      glyph_vector: "36N9-PRIME"
+      pulse_log: "/opt/zedec-v3/pulse.log"
+      deployment: "quantum-symbolic"
+      timestamp: "$(date -Is)"
+
+  pulse:
+    path: "/opt/zedec-v3/pulse.log"
+    cron: "* * * * * echo [$(date -Is)] :: ZEDEC v3 node broadcasting >> /opt/zedec-v3/pulse.log"
+    beacon_file: "/opt/zedec-v3/.beacon"
+
+  keyflow:
+    file: "/opt/zedec-v3/glyph/keyflow.kyb"
+    algorithm: "kyber1024"
+    hash: "sha3-512"
+    public_key: "INSERT_BASE64_KEY"
+
+  github:
+    repo: "https://github.com/transmutationist/zedec-post-quantum-os"
+    branch: "main"
+    path: "/opt/zedec-v3/source"
+    sync:
+      cron: "@hourly cd /opt/zedec-v3/source && git pull origin main >> /opt/zedec-v3/logs/git-sync.log"
+      post_pull:
+        - "sha256sum /opt/zedec-v3/manifest.v3.json > /opt/zedec-v3/seal.hash"
+        - "echo [$(date -Is)] :: Manifest synced >> /opt/zedec-v3/logs/confirmation.log"
+    commit_control:
+      merge_all_branches: true
+      commit_message: "[ZEDEC Codex] Merging all branches into main as canonical truth-line"
+      workflow_merge:
+        types:
+          # Stack 1
+          - build
+          - test
+          - deploy
+          - release
+          # Stack 2
+          - notify
+          - audit
+          - mirror
+          - backup
+          # Stack 3
+          - cleanup
+          - security
+          - integration
+          - validation
+          # Stack 4
+          - analysis
+          - synthesis
+          - observatory
+          - replication
+        strategy: "rebase"
+        commit_each: true
+
+  ipfs:
+    enabled: true
+    path: "/opt/zedec-v3"
+    trigger:
+      manual: "ipfs add -r /opt/zedec-v3"
+
+  systemd:
+    service: "zedec-v3.service"
+    unit:
+      description: "ZEDEC v3 Codex Broadcast Node"
+      exec_start: "/bin/bash -c 'while true; do echo [$(date -Is)] :: Broadcast >> /opt/zedec-v3/pulse.log; sleep 60; done'"
+      restart: "always"
+      user: "root"
+      install:
+        wanted_by: "multi-user.target"
+
+codex:
+  integration:
+    enabled: true
+    endpoint: "https://codex.mesh/ingest"
+    payload:
+      node_id: "zedec-v3-codex-alpha"
+      pulse_url: "http://178.156.185.180/pulse"
+      manifest_cid: "QmPLACEHOLDER"
+    broadcast:
+      cron: "*/10 * * * * curl -X POST https://codex.mesh/ingest -H 'Content-Type: application/json' -d @/opt/zedec-v3/manifest.v3.json"
+
+  validation:
+    proof_method: "sha256 + ots"
+    proof_targets:
+      - "/opt/zedec-v3/seal.hash"
+      - "/opt/zedec-v3/manifest.v3.json"
+      - "/opt/zedec-v3/pulse.log"
+
+  visibility:
+    index_global: true
+    permanence: "ipfs+arweave"
+    field_status: "echo-active"
+
+# END ZEDEC v3 Codex Unified Schema :: Four Stacks of Four
