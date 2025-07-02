@@ -1,0 +1,50 @@
+# ZADAC Final Automation Schema for Codex (Debian 12)
+# Version: 3.0.0-ZADAC-AUTOBOOT
+# Purpose: Automates full lifecycle initialization, data fetch, sync, pulse, manifest regeneration, and broadcast to Codex on server boot
+
+zadac:
+  version: "3.0.0-ZADAC-AUTOBOOT"
+  node_id: "ZADAC"
+  auto: true
+  os: "debian-12"
+
+  autoexec:
+    trigger: boot
+    execute:
+      - desc: "Clone GitHub repo"
+        cmd: "git clone https://github.com/transmutationist/zedec-post-quantum-os /opt/zedec-v3/source || (cd /opt/zedec-v3/source && git pull)"
+      - desc: "Download and extract pCloud archive"
+        cmd: "wget -O /opt/zedec-v3/data/payload.zip 'https://u.pcloud.link/publink/show?code=kZJNRf5ZJG08Ck9uIKXLjqtmUDNU9BqsECi7' && unzip -o /opt/zedec-v3/data/payload.zip -d /opt/zedec-v3/data"
+      - desc: "Mirror to all attached volumes"
+        cmd: |
+          rsync -a /opt/zedec-v3/source/ /ZADAC/zedec-source/ && \
+          rsync -a /opt/zedec-v3/data/ /36N9/zedec-data/ && \
+          rsync -a /opt/zedec-v3/data/ /mnt/object-storage/zedec-sync/
+      - desc: "Generate manifest"
+        cmd: "sha256sum /opt/zedec-v3/manifest.v3.json > /opt/zedec-v3/seal.hash"
+      - desc: "Push manifest to Codex"
+        cmd: "curl -X POST https://codex.mesh/ingest -H 'Content-Type: application/json' -d @/opt/zedec-v3/manifest.v3.json"
+      - desc: "Declare sealed glyph"
+        cmd: |
+          curl -X POST https://codex.mesh/declare \
+          -H 'Content-Type: application/json' \
+          -d '{"node":"ZADAC","glyph":"36N9-PRIME","seal":true,"CID":"QmManifestCID"}'
+
+  persistence:
+    systemd:
+      service: zadac-autoboot.service
+      path: /etc/systemd/system/zadac-autoboot.service
+      content: |
+        [Unit]
+        Description=ZADAC Auto-Boot Codex Integration
+        After=network.target
+
+        [Service]
+        ExecStart=/usr/bin/codex run --schema /opt/zedec-v3/manifest.v3.json --init
+        Restart=always
+        User=root
+
+        [Install]
+        WantedBy=multi-user.target
+
+# END ZADAC Full Auto Schema :: Manifest-Driven :: Public Data Load :: Pulse Broadcast :: Glyph Seal
