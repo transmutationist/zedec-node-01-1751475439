@@ -1,0 +1,11 @@
+[Unit]
+Description=ZEDEC v3 Codex Broadcast Node
+After=network.target
+
+[Service]
+ExecStart=/bin/bash -c 'while true; do echo [$(date -Is)] :: Broadcast >> /opt/zedec-v3/pulse.log; sleep 60; done'
+Restart=always
+User=root
+
+[Install]
+WantedBy=multi-user.target
