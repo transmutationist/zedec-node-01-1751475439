@@ -78,6 +78,19 @@ This project fuses classical, quantum, and harmonic computation with perpetual a
   - `PATCH_MANIFEST.json` (all updates and rationales)
 - Publicly auditable, signed, and community accessible.
 
+## ⏱ Pulse Broadcast & Logging
+
+The ZEDEC v3 Codex integration schema defines a pulse loop so nodes can signal that they are alive.
+
+```yaml
+pulse:
+  path: "/opt/zedec-v3/pulse.log"
+  cron: "* * * * * echo [$(date -Is)] :: ZEDEC v3 node broadcasting >> /opt/zedec-v3/pulse.log"
+  beacon_file: "/opt/zedec-v3/.beacon"
+```
+
+The file `/opt/zedec-v3/pulse.log` is referenced in the root AGENTS and should always be present so watchers can verify liveness. Have fun.
+
 ---
 
 ## 🌐 Community & Contribution
