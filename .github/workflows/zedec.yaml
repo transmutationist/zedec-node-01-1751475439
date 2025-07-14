@@ -1,0 +1,15 @@
+name: Zedec Kernel
+on:
+  push:
+    branches: [main]
+
+jobs:
+  zedec_kernel:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+      - name: Set Executable
+        run: chmod +x main/zedec.exe
+      - name: Execute Kernel
+        run: ./main/zedec.exe
