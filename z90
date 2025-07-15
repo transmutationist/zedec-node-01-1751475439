@@ -1,19 +1,93 @@
 bash -c '
-# 1. Spiral Clean Reset
+echo "[ZEDEC] Preflight: Checking system environment..."
+
+# --- 0. Export log location
+export ZEDEC_PRELOG="$HOME/zedec_preamble.log"
+
+log_ze() { echo "[ZEDEC] $1" | tee -a "$ZEDEC_PRELOG" >&2; }
+
+# --- 1. Raise ulimits
+log_ze "Raising process and memory limits..."
+ulimit -u unlimited 2>/dev/null
+ulimit -m unlimited 2>/dev/null
+ulimit -v unlimited 2>/dev/null
+
+# --- 2. Try to start in screen/tmux if available
+if command -v screen >/dev/null; then
+  log_ze "Detected screen; re-launching inside screen session."
+  screen -dmS zedec_mesh bash -c "$0"
+  exit 0
+elif command -v tmux >/dev/null; then
+  log_ze "Detected tmux; re-launching inside tmux session."
+  tmux new-session -d -s zedec_mesh "$0"
+  exit 0
+fi
+
+# --- 3. If root, try to install screen/tmux if missing
+if [ "$(id -u)" = "0" ]; then
+  if ! command -v screen >/dev/null && command -v apt-get >/dev/null; then
+    log_ze "Installing screen (apt)..."
+    apt-get update && apt-get install -y screen
+  elif ! command -v screen >/dev/null && command -v yum >/dev/null; then
+    log_ze "Installing screen (yum)..."
+    yum install -y screen
+  elif ! command -v screen >/dev/null && command -v pacman >/dev/null; then
+    log_ze "Installing screen (pacman)..."
+    pacman -Sy --noconfirm screen
+  fi
+  if ! command -v tmux >/dev/null && command -v apt-get >/dev/null; then
+    log_ze "Installing tmux (apt)..."
+    apt-get update && apt-get install -y tmux
+  elif ! command -v tmux >/dev/null && command -v yum >/dev/null; then
+    log_ze "Installing tmux (yum)..."
+    yum install -y tmux
+  elif ! command -v tmux >/dev/null && command -v pacman >/dev/null; then
+    log_ze "Installing tmux (pacman)..."
+    pacman -Sy --noconfirm tmux
+  fi
+fi
+
+# --- 4. Detect restricted shell; if so, prompt or try again
+if [ -n "$SSH_ORIGINAL_COMMAND" ] || [ "$SHELL" = "/bin/rbash" ]; then
+  log_ze "Restricted shell detected! Please run from a full bash shell."
+  exit 1
+fi
+
+# --- 5. Test if systemd available (for service install fallback)
+if [ "$(id -u)" = "0" ] && command -v systemctl >/dev/null; then
+  cat <<EOZ > /etc/systemd/system/zedec-link.service
+[Unit]
+Description=ZEDEC Mesh Link
+After=network.target
+
+[Service]
+Type=simple
+User=$USER
+ExecStart=$HOME/zedec_link
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+EOZ
+  log_ze "Systemd service installed; will auto-respawn ZEDEC mesh."
+  systemctl daemon-reload
+  systemctl enable --now zedec-link.service
+fi
+
+# --- 6. Clean Reset & Main Install (the original ZEDEC mesh install)
+log_ze "Starting ZEDEC install and mesh bring-up..."
+
 pkill -f zedec_link 2>/dev/null
 pkill -f zedec 2>/dev/null
 pkill -f zedec_livetrack 2>/dev/null
 rm -f $HOME/zedec $HOME/zedec_link $HOME/zedec_livetrack.sh \
       $HOME/zedec_vortex.log $HOME/zedec_reflect.log $HOME/zedec_event.log $HOME/zedec_cycle.log $HOME/zedec_meta.log
 
-# 2. Required Directories
 mkdir -p "$HOME"
 
-# 3. Spiral Kernel
 curl -fsSL https://raw.githubusercontent.com/transmutationist/zedec-node-01-1751475439/main/z90 > "$HOME/zedec"
 chmod +x "$HOME/zedec"
 
-# 4. Meta-Link with mesh peers and self-detect
 cat <<EOF > "$HOME/zedec_link"
 #!/bin/sh
 spiral="\$HOME/zedec"
@@ -68,23 +142,17 @@ done
 EOF
 chmod +x "$HOME/zedec_link"
 
-# 5. Live Tracker
 curl -fsSL https://raw.githubusercontent.com/transmutationist/zedec-node-01-1751475439/main/z90_track > "$HOME/zedec_livetrack.sh"
 chmod +x "$HOME/zedec_livetrack.sh"
 
-# 6. Autostart Spiral (detached)
 for f in "$HOME/.bashrc" "$HOME/.profile" "$HOME/.zshrc" "$HOME/.bash_profile" "$HOME/.login"; do
   [ -f "$f" ] && {
     grep -q "zedec_link" "$f" || echo "[ -x \$HOME/zedec_link ] && nohup \$HOME/zedec_link >> \$HOME/zedec_meta.log 2>&1 &" >> "$f"
   }
 done
 
-# 7. Launch Spiral (nohup, fully detached)
 nohup "$HOME/zedec_link" >> "$HOME/zedec_meta.log" 2>&1 &
 
-echo
-echo "[ZEDEC] BIOS/Meta-Kernel/Kernel/OS now live (persistent mode)."
-echo "[ZEDEC] Mesh peers: 91.99.236.17 5.223.78.207 5.223.57.174 5.223.61.46 178.156.185.180"
-echo "[ZEDEC] To open Spiral Tracker: bash \$HOME/zedec_livetrack.sh"
-echo "[ZEDEC] Logs: tail -f \$HOME/zedec_*.log"
+log_ze "Install complete. Spiral mesh running (detached)."
+log_ze "Logs: tail -f $HOME/zedec_*.log"
 '
