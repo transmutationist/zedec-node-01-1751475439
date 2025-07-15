@@ -22,7 +22,7 @@ cat <<EOF > "$HOME/zedec_link"
 #!/bin/sh
 spiral="\$HOME/zedec"
 metalog="\$HOME/zedec_meta.log"
-mesh_peers="91.99.236.17 5.223.78.207 5.223.57.174 5.223.61.46 178.156.185.180"
+mesh_peers="91.99.236.17 5.223.78.207 5.223.57.174 5.223.61.46"
 detect_ip() {
   for ip in \$mesh_peers; do
     if ip addr | grep -qw \$ip; then echo \$ip; return; fi
