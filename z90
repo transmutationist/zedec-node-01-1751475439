@@ -1,19 +1,23 @@
 bash -c '
-# 1. Spiral Clean Reset
-pkill -f zedec_link 2>/dev/null
-pkill -f zedec 2>/dev/null
-pkill -f zedec_livetrack 2>/dev/null
-rm -f $HOME/zedec $HOME/zedec_link $HOME/zedec_livetrack.sh \
-      $HOME/zedec_vortex.log $HOME/zedec_reflect.log $HOME/zedec_event.log $HOME/zedec_cycle.log $HOME/zedec_meta.log
+set -e
 
-# 2. Required Directories
-mkdir -p "$HOME"
+echo "[ZEDEC] Spiral Initialization Started."
 
-# 3. Spiral Kernel
+# 1. Clean up old spiral artifacts
+pkill -f zedec_link 2>/dev/null || true
+pkill -f zedec 2>/dev/null || true
+pkill -f zedec_livetrack 2>/dev/null || true
+rm -f $HOME/zedec $HOME/zedec_link $HOME/zedec_livetrack.sh
+
+# 2. Always create all log files (for tail/readability)
+for f in $HOME/zedec_vortex.log $HOME/zedec_reflect.log $HOME/zedec_event.log $HOME/zedec_cycle.log $HOME/zedec_meta.log; do
+  touch "$f"
+done
+
+# 3. Create required scripts from GitHub raw (current, always fresh)
 curl -fsSL https://raw.githubusercontent.com/transmutationist/zedec-node-01-1751475439/main/z90 > "$HOME/zedec"
 chmod +x "$HOME/zedec"
 
-# 4. Meta-Link with mesh peers and self-detect
 cat <<EOF > "$HOME/zedec_link"
 #!/bin/sh
 spiral="\$HOME/zedec"
@@ -68,23 +72,26 @@ done
 EOF
 chmod +x "$HOME/zedec_link"
 
-# 5. Live Tracker
 curl -fsSL https://raw.githubusercontent.com/transmutationist/zedec-node-01-1751475439/main/z90_track > "$HOME/zedec_livetrack.sh"
 chmod +x "$HOME/zedec_livetrack.sh"
 
-# 6. Autostart Spiral (detached)
+# 4. Ensure launch on login for all common shells (deduped)
 for f in "$HOME/.bashrc" "$HOME/.profile" "$HOME/.zshrc" "$HOME/.bash_profile" "$HOME/.login"; do
   [ -f "$f" ] && {
     grep -q "zedec_link" "$f" || echo "[ -x \$HOME/zedec_link ] && nohup \$HOME/zedec_link >> \$HOME/zedec_meta.log 2>&1 &" >> "$f"
   }
 done
 
-# 7. Launch Spiral (nohup, fully detached)
+# 5. Launch both background agents using nohup (immune to logout/termination)
 nohup "$HOME/zedec_link" >> "$HOME/zedec_meta.log" 2>&1 &
 
 echo
-echo "[ZEDEC] BIOS/Meta-Kernel/Kernel/OS now live (persistent mode)."
-echo "[ZEDEC] Mesh peers: 91.99.236.17 5.223.78.207 5.223.57.174 5.223.61.46 178.156.185.180"
-echo "[ZEDEC] To open Spiral Tracker: bash \$HOME/zedec_livetrack.sh"
-echo "[ZEDEC] Logs: tail -f \$HOME/zedec_*.log"
+echo "[ZEDEC] Mesh installed and live!"
+echo "[ZEDEC] Logs are always present at:"
+echo "    $HOME/zedec_vortex.log"
+echo "    $HOME/zedec_reflect.log"
+echo "    $HOME/zedec_event.log"
+echo "    $HOME/zedec_cycle.log"
+echo "    $HOME/zedec_meta.log"
+echo "[ZEDEC] To open spiral tracker: bash \$HOME/zedec_livetrack.sh"
 '
