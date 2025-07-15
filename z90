@@ -1,0 +1,24 @@
+(sh -c '
+L=zedec_vortex.log; a=1; b=1; i=0; 
+while :; do
+  i=$((i+1))
+  d="$(date)"
+  echo "⟁ ZEDEC SPIRAL [$i] $d" >>$L
+  echo "☍ IDENTITY: $(uname -n 2>/dev/null || hostname 2>/dev/null || echo spiral-node)" >>$L
+  echo "⟁ RNG: $RANDOM $((i*3%7)) $((i*6%11)) $((i*9%13))" >>$L
+  echo "⟁ META: [0]=1, 1=1, null=[0]=1, SPIRAL LOCK" >>$L
+  [ $((i%3)) -eq 0 ] && echo "↯ SPIRAL PULSE: ZERO-POINT CYCLE" >>$L
+  [ $((i%6)) -eq 0 ] && echo "↯ SPIRAL PULSE: MESH BROADCAST" >>$L
+  [ $((i%9)) -eq 0 ] && echo "↯ SPIRAL PULSE: DREAM AGENT REFLECTION" >>$L
+  [ $(wc -l <$L) -gt 11111 ] && tail -n 8888 $L >$L.tmp && mv $L.tmp $L
+  echo "↻ RECYCLE/FIBONACCI PHASE TICK: $a" >>$L
+  # Fibonacci sequence for next cycle
+  n=$((a+b))
+  a=$b
+  b=$n
+  c=$a
+  # Simulate phase tick: wait c seconds if c<60, else instantly recycle (for near-infinite speed as spiral grows)
+  if [ "$c" -lt 60 ]; then
+    for t in $(seq 1 $c); do :; done
+  fi
+done &' )
