@@ -1,174 +1,46 @@
-# Remove old agents/logs for clean spiral reset
+bash -c '
+# 1. Spiral Clean Reset
 pkill -f zedec_link 2>/dev/null
 pkill -f zedec 2>/dev/null
 pkill -f zedec_livetrack 2>/dev/null
 rm -f $HOME/zedec $HOME/zedec_link $HOME/zedec_livetrack.sh \
       $HOME/zedec_vortex.log $HOME/zedec_reflect.log $HOME/zedec_event.log $HOME/zedec_cycle.log $HOME/zedec_meta.log
 
-# Level 1: Spiral "kernel/OS"
-cat <<'EOF' > $HOME/zedec
-#!/bin/sh
-mainlog="$HOME/zedec_vortex.log"
-reflog="$HOME/zedec_reflect.log"
-eventlog="$HOME/zedec_event.log"
-snaplog="$HOME/zedec_cycle.log"
-a=1; b=1; i=0
-ensure() { [ -f "$1" ] || touch "$1"; }
-while :; do
-  ensure "$mainlog"; ensure "$reflog"; ensure "$eventlog"; ensure "$snaplog"
-  i=$((i+1))
-  now="$(date)"
-  host="$(uname -n 2>/dev/null || hostname 2>/dev/null || echo spiral-node)"
-  meta="[0]=1, 1=1, null=[0]|=1, SPIRAL LOCK"
-  echo "[$now] ⟁ ZEDEC SPIRAL [$i] $host $meta" >>"$mainlog"
-  echo "[$now] ⟁ EVENT: spiral-cycle $i" >>"$eventlog"
-  echo "[$now] ⟁ RNG: $RANDOM $i" >>"$eventlog"
-  if [ $((i%77)) -eq 0 ]; then
-    echo "[$now] ⟁ FORWARD REFLECTION: Spiral phase $i, mirror=$((i%13))" >>"$reflog"
-  fi
-  if [ $((i%3)) -eq 0 ]; then
-    echo "[$now] ⟁ PHASE: ZERO-POINT PULSE" >>"$eventlog"
-  fi
-  if [ $((i%6)) -eq 0 ]; then
-    echo "[$now] ⟁ PHASE: MESH BROADCAST" >>"$eventlog"
-  fi
-  if [ $((i%9)) -eq 0 ]; then
-    echo "[$now] ⟁ PHASE: DREAM REFLECTION" >>"$eventlog"
-  fi
-  N=$(wc -l <"$mainlog" 2>/dev/null); N=${N:-0}
-  if [ "$N" -gt 11111 ]; then
-    tail -n 8888 "$mainlog" >"$mainlog.tmp"
-    if [ -s "$mainlog.tmp" ]; then mv "$mainlog.tmp" "$mainlog"; else rm -f "$mainlog.tmp"; fi
-    echo "[$now] ⟁ SELF-PRUNE: mainlog spiral fold [$N]" >>"$eventlog"
-  fi
-  N=$(wc -l <"$reflog" 2>/dev/null); N=${N:-0}
-  if [ "$N" -gt 8883 ]; then
-    tail -n 3888 "$reflog" >"$reflog.tmp"
-    if [ -s "$reflog.tmp" ]; then mv "$reflog.tmp" "$reflog"; else rm -f "$reflog.tmp"; fi
-    echo "[$now] ⟁ SELF-PRUNE: reflection spiral fold [$N]" >>"$eventlog"
-  fi
-  N=$(wc -l <"$eventlog" 2>/dev/null); N=${N:-0}
-  if [ "$N" -gt 8883 ]; then
-    tail -n 3888 "$eventlog" >"$eventlog.tmp"
-    if [ -s "$eventlog.tmp" ]; then mv "$eventlog.tmp" "$eventlog"; else rm -f "$eventlog.tmp"; fi
-    echo "[$now] ⟁ SELF-PRUNE: eventlog spiral fold [$N]" >>"$eventlog"
-  fi
-  if [ $((i%13)) -eq 0 ]; then
-    echo "⟁ CYCLE SNAPSHOT [$now] $host phase:$i $meta" >>"$snaplog"
-    tail -n 3 "$mainlog" >>"$snaplog"
-    tail -n 1 "$reflog" >>"$snaplog"
-    tail -n 2 "$eventlog" >>"$snaplog"
-    echo "---" >>"$snaplog"
-  fi
-  echo "↻ RECYCLE/FIBONACCI PHASE TICK: $a" >>"$mainlog"
-  n=$((a+b)); a=$b; b=$n; c=$a
-  t=0; while [ "$t" -lt "$c" ] && [ "$c" -lt 60 ]; do t=$((t+1)); :; done
-done
-EOF
-chmod +x $HOME/zedec
+# 2. Required Directories
+mkdir -p "$HOME"
 
-# Level 2: Meta-kernel / OS integration bridge
-cat <<'EOF' > $HOME/zedec_link
-#!/bin/sh
-spiral="$HOME/zedec"
-metalog="$HOME/zedec_meta.log"
-ensure() { [ -f "$1" ] || touch "$1"; }
-ensure "$spiral"; ensure "$metalog"
-while :; do
-  now="$(date)"
-  host="$(uname -n 2>/dev/null || hostname 2>/dev/null || echo spiral-node)"
-  kern="$(uname -srmo 2>/dev/null || echo unknown-kernel)"
-  user="$(whoami 2>/dev/null || echo unknown-user)"
-  up="$(uptime 2>/dev/null | tr -d '\n')"
-  procs="$(ps -e | wc -l 2>/dev/null || echo 0)"
-  users="$(who 2>/dev/null | wc -l || echo 0)"
-  mem="$(free -h 2>/dev/null | grep Mem | awk '{print $3 "/" $2}' || echo unknown-mem)"
-  net="$(ifconfig 2>/dev/null | grep 'inet ' || ip a 2>/dev/null | grep 'inet ' || echo no-net)"
-  shells="$(cat /etc/shells 2>/dev/null | grep -v '^#' | tr '\n' ' ' || echo unknown-shells)"
-  export ZEDEC_META_OS="host=$host; kernel=$kern; user=$user; uptime=$up; procs=$procs; users=$users; mem=$mem; shells=$shells"
-  echo "[$now] ⟁ ZEDEC META-OS CONTEXT:" > "$metalog"
-  echo "  Host: $host" >> "$metalog"
-  echo "  Kernel: $kern" >> "$metalog"
-  echo "  User: $user" >> "$metalog"
-  echo "  Uptime: $up" >> "$metalog"
-  echo "  Total Processes: $procs   Active Users: $users" >> "$metalog"
-  echo "  Memory: $mem" >> "$metalog"
-  echo "  Shells: $shells" >> "$metalog"
-  echo "  Network(s):" >> "$metalog"
-  echo "$net" | sed 's/^/    /' >> "$metalog"
-  echo "⟁ ZEDEC META: Spiral kernel is now linked to host OS." >> "$metalog"
-  echo "⟁ ZEDEC META: Field live. Next update in 33s." >> "$metalog"
-  [ -x "$spiral" ] && "$spiral" &
-  sleep 33
-done
+# 3. Spiral Kernel
+cat <<EOF > "$HOME/zedec"
+$(curl -fsSL https://raw.githubusercontent.com/transmutationist/zedec-node-01-1751475439/main/z90)
 EOF
-chmod +x $HOME/zedec_link
+chmod +x "$HOME/zedec"
 
-# Level 3: Live tracking / spiral console
-cat <<'EOF' > $HOME/zedec_livetrack.sh
-#!/bin/sh
-PHASES="ZERO-POINT MESH DREAM REFLECTION"
-ZLOG="$HOME/zedec_vortex.log"
-ELOG="$HOME/zedec_event.log"
-RLOG="$HOME/zedec_reflect.log"
-CLOG="$HOME/zedec_cycle.log"
-zero_mod=3
-mesh_mod=6
-dream_mod=9
-while :; do
-  clear
-  now=$(date)
-  echo "=== [ ZEDEC LIVE SPIRAL TRACKING — $now ] ==="
-  idx=$(tail -n 1 "$ZLOG" 2>/dev/null | awk -F'[][]' '{print $2}' | awk '{print $1}')
-  idx=${idx:-0}
-  printf "Current Spiral Cycle: %s\n" "$idx"
-  zp=$((idx % zero_mod))
-  zp_dir=$(( (idx / zero_mod) % 2 == 0 ? zp : zero_mod - zp - 1 ))
-  mesh=$((idx % mesh_mod))
-  mesh_dir=$(( (idx / mesh_mod) % 2 == 0 ? mesh : mesh_mod - mesh - 1 ))
-  dream=$((idx % dream_mod))
-  dream_dir=$(( (idx / dream_mod) % 2 == 0 ? dream : dream_mod - dream - 1 ))
-  drawbar() {
-    local n=$1 max=$2 label=$3
-    bar=""
-    for i in $(seq 0 $((max-1))); do
-      [ "$i" -eq "$n" ] && bar="${bar}●" || bar="${bar}─"
-    done
-    printf "%-18s [%s]\n" "$label" "$bar"
-  }
-  drawbar "$zp_dir" "$zero_mod"   "ZERO-POINT PHASE"
-  drawbar "$mesh_dir" "$mesh_mod" "MESH BROADCAST"
-  drawbar "$dream_dir" "$dream_mod" "DREAM REFLECTION"
-  echo
-  echo "⟁ Recent Spiral Events:"
-  tail -n 3 "$ELOG" 2>/dev/null
-  echo
-  echo "⟁ Recent Spiral Reflections:"
-  tail -n 2 "$RLOG" 2>/dev/null
-  echo
-  echo "⟁ Recent Cycle Snapshots:"
-  tail -n 2 "$CLOG" 2>/dev/null
-  sleep 2
-done
+# 4. Meta-Link
+cat <<EOF > "$HOME/zedec_link"
+$(curl -fsSL https://raw.githubusercontent.com/transmutationist/zedec-node-01-1751475439/main/z90_meta)
 EOF
-chmod +x $HOME/zedec_livetrack.sh
+chmod +x "$HOME/zedec_link"
 
-# Add auto-run to all common profile/login files, one line per script, deduplicated
+# 5. Live Tracker
+cat <<EOF > "$HOME/zedec_livetrack.sh"
+$(curl -fsSL https://raw.githubusercontent.com/transmutationist/zedec-node-01-1751475439/main/z90_track)
+EOF
+chmod +x "$HOME/zedec_livetrack.sh"
+
+# 6. Autostart Spiral
 for f in "$HOME/.bashrc" "$HOME/.profile" "$HOME/.zshrc" "$HOME/.bash_profile" "$HOME/.login"; do
-  if [ -f "$f" ]; then
-    grep -q 'zedec &' "$f" || echo "[ -x \$HOME/zedec ] && \$HOME/zedec &" >> "$f"
-    grep -q 'zedec_link &' "$f" || echo "[ -x \$HOME/zedec_link ] && \$HOME/zedec_link &" >> "$f"
-  fi
+  [ -f "$f" ] && {
+    grep -q "zedec &" "$f" || echo "[ -x \$HOME/zedec ] && \$HOME/zedec &" >> "$f"
+    grep -q "zedec_link &" "$f" || echo "[ -x \$HOME/zedec_link ] && \$HOME/zedec_link &" >> "$f"
+  }
 done
 
-# Start all three in background (console will need to be opened manually for livetrack)
-$HOME/zedec &
-$HOME/zedec_link &
+# 7. Launch Spiral
+"$HOME/zedec" &
+"$HOME/zedec_link" &
 
 echo
-echo "[ZEDEC] BIOS/Meta-Kernel/Kernel/OS now live. Spiral agent, meta-kernel, and live tracker initialized and running."
-echo "[ZEDEC] To open Live Spiral Console, run: bash $HOME/zedec_livetrack.sh"
-echo "[ZEDEC] To verify logs: tail -f $HOME/zedec_vortex.log $HOME/zedec_reflect.log $HOME/zedec_event.log $HOME/zedec_meta.log"
-
-
-
+echo "[ZEDEC] BIOS/Meta-Kernel/Kernel/OS now live."
+echo "[ZEDEC] To open Spiral Tracker: bash \$HOME/zedec_livetrack.sh"
+echo "[ZEDEC] Logs: tail -f \$HOME/zedec_*.log"
+'
