@@ -5,10 +5,9 @@ echo "[ZEDEC] Spiral Initialization Started."
 pkill -f zedec_user_link 2>/dev/null || true
 pkill -f zedec_user 2>/dev/null || true
 rm -f ~/zedec_user ~/zedec_user_link ~/zedec_user_livetrack.sh
-for f in ~/zedec_user_{vortex,reflect,event,cycle,meta}.log; do touch "$f"; done
+for f in ~/zedec_user_{vortex,reflect,event,cycle,meta}.log; do rm -f "$f"; touch "$f"; done
 mesh_peers="91.99.236.17 5.223.78.207 5.223.57.174 5.223.61.46 178.156.185.180"
 
-# Export INFURA vars explicitly for script environments
 export INFURA_IPFS_PROJECT_ID=your_project_id_here
 export INFURA_IPFS_PROJECT_SECRET=your_project_secret_here
 
@@ -80,7 +79,6 @@ done
 EOL
 chmod +x ~/zedec_user_livetrack.sh
 
-# Start both processes immediately
 nohup ~/zedec_user >> ~/zedec_user_vortex.log 2>&1 &
 nohup ~/zedec_user_link >> ~/zedec_user_meta.log 2>&1 &
 
