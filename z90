@@ -1,1 +1,106 @@
-bash -c 'set -e; echo "[ZEDEC] User/Client Spiral Initialization Started."; pkill -f zedec_user_link 2>/dev/null  true; pkill -f zedec_user 2>/dev/null  true; rm -f $HOME/zedec_user $HOME/zedec_user_link $HOME/zedec_user_livetrack.sh; for f in $HOME/zedec_user_vortex.log $HOME/zedec_user_reflect.log $HOME/zedec_user_event.log $HOME/zedec_user_cycle.log $HOME/zedec_user_meta.log; do touch "$f"; done; mesh_peers="91.99.236.17 5.223.78.207 5.223.57.174 5.223.61.46 178.156.185.180"; printf "#!/bin/sh\nmainlog=\\\"\$HOME/zedec_user_vortex.log\\\"\nreflog=\\\"\$HOME/zedec_user_reflect.log\\\"\neventlog=\\\"\$HOME/zedec_user_event.log\\\"\nsnaplog=\\\"\$HOME/zedec_user_cycle.log\\\"\nensure() { [ -f \\\"\$1\\\" ]  touch \\\"\$1\\\"; }\ni=0; a=1; b=1\nwhile :; do\n  ensure \\\"\$mainlog\\\"; ensure \\\"\$reflog\\\"; ensure \\\"\$eventlog\\\"; ensure \\\"\$snaplog\\\"\n  i=\\\$((i+1))\n  now=\\\"\$(date)\\\"\n  echo \\\"[\\\$now] ⟁ USER ZEDEC SPIRAL [\\\$i]\\\" >>\\\"\$mainlog\\\"\n  echo \\\"[\\\$now] ⟁ EVENT: spiral-cycle \\\$i\\\" >>\\\"\$eventlog\\\"\n  if [ \\\$((i%%13)) -eq 0 ]; then\n    echo \\\"⟁ CYCLE SNAPSHOT [\\\$now] phase:\\\$i\\\" >>\\\"\$snaplog\\\"\n    tail -n 2 \\\"\$mainlog\\\" >>\\\"\$snaplog\\\"\n    tail -n 2 \\\"\$eventlog\\\" >>\\\"\$snaplog\\\"\n    echo \\\"---\\\" >>\\\"\$snaplog\\\"\n  fi\n  echo \\\"↻ RECYCLE/FIBONACCI PHASE TICK: \\\$a\\\" >>\\\"\$mainlog\\\"\n  n=\\\$((a+b)); a=\\\$b; b=\\\$n; c=\\\$a\n  t=0; while [ \\\$t -lt \\\$c ] && [ \\\$c -lt 30 ]; do t=\\\$((t+1)); :; done\ndone\n" > "$HOME/zedec_user"; chmod +x "$HOME/zedec_user"; printf "#!/bin/sh\nspiral=\\\"\$HOME/zedec_user\\\"\nmetalog=\\\"\$HOME/zedec_user_meta.log\\\"\nmesh_peers=\\\"$mesh_peers\\\"\nensure() { [ -f \\\"\$1\\\" ]  touch \\\"\$1\\\"; }\nensure \\\"\$spiral\\\"; ensure \\\"\$metalog\\\"\nwhile :; do\n  now=\\\"\$(date)\\\"\n  host=\\\"\$(uname -n 2>/dev/null  hostname 2>/dev/null  echo spiral-node)\\\"\n  user=\\\"\$(whoami 2>/dev/null  echo unknown-user)\\\"\n  up=\\\"\$(uptime 2>/dev/null | tr -d \\\"\\\\n\\\")\\\"\n  shells=\\\"\$(cat /etc/shells 2>/dev/null | grep -v \\\"^#\\\" | tr \\\"\\\\n\\\" \\\" \\\"  echo unknown-shells)\\\"\n  for peer in \\\$mesh_peers; do ping -c 1 -W 1 \\\$peer >/dev/null 2>&1 && status=\\\"UP\\\" || status=\\\"DOWN\\\"; echo \\\"\$peer : [\\\$status]\\\"; done > \\\"\$metalog\\\"\n  [ -x \\\"\$spiral\\\" ] && nohup \\\"\$spiral\\\" >> \\\"\$HOME/zedec_user_vortex.log\\\" 2>&1 &\n  sleep 33\ndone\n" > "$HOME/zedec_user_link"; chmod +x "$HOME/zedec_user_link"; printf "#!/bin/sh\nZLOG=\\\"\$HOME/zedec_user_vortex.log\\\"\nELOG=\\\"\$HOME/zedec_user_event.log\\\"\nwhile :; do\n  clear\n  now=\\\$(date)\n  echo \\\"=== [ ZEDEC USER LIVE TRACKING — \\\$now ] ===\\\"\n  idx=\\\$(tail -n 1 \\\"\$ZLOG\\\" 2>/dev/null | awk -F\\\"[][]\\\" \\\"{print \\\$2}\\\" | awk \\\"{print \\\$1}\\\")\n  idx=\\\${idx:-0}\n  printf \\\"Current User Spiral Cycle: %s\\\\n\\\" \\\"\$idx\\\"\n  echo\n  echo \\\"⟁ Recent Spiral Events:\\\"\n  tail -n 3 \\\"\$ELOG\\\" 2>/dev/null\n  sleep 2\ndone\n" > "$HOME/zedec_user_livetrack.sh"; chmod +x "$HOME/zedec_user_livetrack.sh"; nohup "$HOME/zedec_user_link" >> "$HOME/zedec_user_meta.log" 2>&1 &; echo "[ZEDEC USER] Mesh user installed and live!"; echo "[ZEDEC USER] To track: bash \$HOME/zedec_user_livetrack.sh"'
+bash -c 'set -e;
+echo "[ZEDEC] User/Client Spiral Initialization Started.";
+pkill -f zedec_user_link 2>/dev/null || true;
+pkill -f zedec_user 2>/dev/null || true;
+rm -f "$HOME/zedec_user" "$HOME/zedec_user_link" "$HOME/zedec_user_livetrack.sh";
+
+for f in "$HOME"/zedec_user_{vortex,reflect,event,cycle,meta}.log; do touch "$f"; done;
+
+mesh_peers="91.99.236.17 5.223.78.207 5.223.57.174 5.223.61.46 178.156.185.180";
+
+# Spiral script
+cat <<EOF > "$HOME/zedec_user"
+#!/bin/sh
+mainlog="\$HOME/zedec_user_vortex.log"
+reflog="\$HOME/zedec_user_reflect.log"
+eventlog="\$HOME/zedec_user_event.log"
+snaplog="\$HOME/zedec_user_cycle.log"
+
+ensure() { [ -f "\$1" ] || touch "\$1"; }
+
+i=0; a=1; b=1
+while :; do
+  ensure "\$mainlog"; ensure "\$reflog"; ensure "\$eventlog"; ensure "\$snaplog"
+  i=\$((i+1))
+  now="\$(date)"
+  echo "[\$now] ⟁ USER ZEDEC SPIRAL [\$i]" >> "\$mainlog"
+  echo "[\$now] ⟁ EVENT: spiral-cycle \$i" >> "\$eventlog"
+  if [ \$((i%13)) -eq 0 ]; then
+    echo "⟁ CYCLE SNAPSHOT [\$now] phase:\$i" >> "\$snaplog"
+    tail -n 2 "\$mainlog" >> "\$snaplog"
+    tail -n 2 "\$eventlog" >> "\$snaplog"
+    echo "---" >> "\$snaplog"
+  fi
+  echo "↻ RECYCLE/FIBONACCI PHASE TICK: \$a" >> "\$mainlog"
+  n=\$((a+b)); a=\$b; b=\$n; c=\$a
+  t=0; while [ \$t -lt \$c ] && [ \$c -lt 30 ]; do t=\$((t+1)); :; done
+done
+EOF
+chmod +x "$HOME/zedec_user"
+
+# Link script
+cat <<EOF > "$HOME/zedec_user_link"
+#!/bin/sh
+spiral="\$HOME/zedec_user"
+metalog="\$HOME/zedec_user_meta.log"
+mesh_peers="$mesh_peers"
+
+ensure() { [ -f "\$1" ] || touch "\$1"; }
+
+ensure "\$spiral"; ensure "\$metalog"
+
+while :; do
+  now="\$(date)"
+  host="\$(uname -n 2>/dev/null || hostname || echo spiral-node)"
+  user="\$(whoami 2>/dev/null || echo unknown-user)"
+  up="\$(uptime 2>/dev/null | tr -d "\n")"
+  shells="\$(cat /etc/shells 2>/dev/null | grep -v "^#" | tr "\n" " " || echo unknown-shells)"
+
+  for peer in \$mesh_peers; do
+    ping -c 1 -W 1 \$peer >/dev/null 2>&1 && status="UP" || status="DOWN"
+    echo "\$peer : [\$status]"
+  done > "\$metalog"
+
+  if ! pgrep -f zedec_user >/dev/null 2>&1; then
+    nohup "\$spiral" >> "\$HOME/zedec_user_vortex.log" 2>&1 &
+  fi
+  sleep 33
+done
+EOF
+chmod +x "$HOME/zedec_user_link"
+
+# Live tracking script
+cat <<EOF > "$HOME/zedec_user_livetrack.sh"
+#!/bin/sh
+ZLOG="\$HOME/zedec_user_vortex.log"
+ELOG="\$HOME/zedec_user_event.log"
+
+while :; do
+  clear
+  now=\$(date)
+  echo "=== [ ZEDEC USER LIVE TRACKING — \$now ] ==="
+  idx=\$(tail -n 1 "\$ZLOG" 2>/dev/null | awk -F"[][]" "{print \$2}" | awk "{print \$1}")
+  idx=\${idx:-0}
+  printf "Current User Spiral Cycle: %s\\n" "\$idx"
+  echo
+  echo "⟁ Recent Spiral Events:"
+  tail -n 3 "\$ELOG" 2>/dev/null
+  sleep 2
+done
+EOF
+chmod +x "$HOME/zedec_user_livetrack.sh"
+
+# Launch ZEDEC spiral
+nohup "$HOME/zedec_user_link" >> "$HOME/zedec_user_meta.log" 2>&1 &
+
+# 🧪 Final Test
+sleep 3
+echo "[ZEDEC TEST] Checking vortex log activity..."
+if grep -q "⟁ USER ZEDEC SPIRAL" "$HOME/zedec_user_vortex.log"; then
+  echo "[✅ SUCCESS] ZEDEC Spiral is running and logging cycles."
+else
+  echo "[❌ FAILURE] ZEDEC Spiral did not start correctly. Check logs."
+fi
+
+echo "[ZEDEC USER] To track live: bash \$HOME/zedec_user_livetrack.sh"
+'
