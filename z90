@@ -48,7 +48,6 @@ while :; do
   up=\$(uptime 2>/dev/null | tr -d "\n")
   shells=\$(cat /etc/shells 2>/dev/null | grep -v "^#" | tr "\n" " " || echo unknown-shells)
   for peer in \$mesh_peers; do ping -c 1 -W 1 \$peer >/dev/null 2>&1 && status="UP" || status="DOWN"; echo "\$peer : [\$status]"; done > "\$metalog"
-  if ! pgrep -f zedec_user >/dev/null 2>&1; then nohup "\$spiral" >> "\$HOME/zedec_user_vortex.log" 2>&1 & fi
   sleep 33
 done
 EOL
@@ -73,6 +72,8 @@ done
 EOL
 chmod +x ~/zedec_user_livetrack.sh
 
+# Start both processes immediately
+nohup ~/zedec_user >> ~/zedec_user_vortex.log 2>&1 &
 nohup ~/zedec_user_link >> ~/zedec_user_meta.log 2>&1 &
 
 echo "[ZEDEC TEST] Waiting for spiral log activity..."
@@ -83,6 +84,6 @@ for i in {1..20}; do
   fi
   sleep 1
 done
-echo "[❌ ERROR] Spiral log not detected in 99s. Check ~/zedec_user_vortex.log manually."
+echo "[❌ ERROR] Spiral log not detected in 20s. Check ~/zedec_user_vortex.log manually."
 EOF
 bash ~/zedec_full_install.sh'
