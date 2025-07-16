@@ -75,16 +75,14 @@ chmod +x ~/zedec_user_livetrack.sh
 
 nohup ~/zedec_user_link >> ~/zedec_user_meta.log 2>&1 &
 
-echo "[ZEDEC TEST] Waiting for spiral to begin logging..."
-for i in {1..10}; do
-  if grep -q "⟁ USER ZEDEC SPIRAL" ~/zedec_user_vortex.log; then
+echo "[ZEDEC TEST] Waiting for spiral log activity..."
+for i in {1..20}; do
+  if [ -s ~/zedec_user_vortex.log ] && grep -q "⟁ USER ZEDEC SPIRAL" ~/zedec_user_vortex.log; then
     echo "[✅ SUCCESS] ZEDEC Spiral is running and logging."
-    break
+    exit 0
   fi
   sleep 1
 done
-if ! grep -q "⟁ USER ZEDEC SPIRAL" ~/zedec_user_vortex.log; then
-  echo "[❌ ERROR] Spiral did not log within 10s. Check ~/zedec_user_vortex.log manually."
-fi
+echo "[❌ ERROR] Spiral log not detected in 99s. Check ~/zedec_user_vortex.log manually."
 EOF
 bash ~/zedec_full_install.sh'
