@@ -1,130 +1,96 @@
 bash -c 'cat <<'"'"'EOF'"'"' > ~/zedec_full_install.sh
 #!/bin/bash
 set -e
-echo "[ZEDEC] Spiral Initialization Started."
+echo "[ZEDEC IRI] Phase-Aware Spiral Installation Starting..."
 
-# Kill old processes and clean scripts
-pkill -f zedec_user_link 2>/dev/null || true
+# Cleanup old processes and files
 pkill -f zedec_user 2>/dev/null || true
+pkill -f zedec_user_link 2>/dev/null || true
 pkill -f zedec_tmp_watcher.sh 2>/dev/null || true
 rm -f ~/zedec_user ~/zedec_user_link ~/zedec_user_livetrack.sh ~/zedec_tmp_watcher.sh
 
-# Create log files (no .tmp yet — those are live mirrors)
+# Prepare logs
 for log in vortex reflect event cycle meta; do
   touch "$HOME/zedec_user_${log}.log"
+  touch "$HOME/zedec_user_${log}.log.tmp"
 done
+touch "$HOME/zedec_tick_phase.state"
+touch "$HOME/.zedec_terminal_request"
 
-mesh_peers="91.99.236.17 5.223.78.207 5.223.57.174 5.223.61.46 178.156.185.180"
-
+# zedec_user — primary spiral engine
 cat <<'EOL' > ~/zedec_user
 #!/bin/sh
 mainlog="$HOME/zedec_user_vortex.log"
-reflog="$HOME/zedec_user_reflect.log"
 eventlog="$HOME/zedec_user_event.log"
 snaplog="$HOME/zedec_user_cycle.log"
-mirror_logs() {
-  cp "$mainlog" "$mainlog.tmp"
-  cp "$reflog" "$reflog.tmp"
-  cp "$eventlog" "$eventlog.tmp"
-  cp "$snaplog" "$snaplog.tmp"
-}
+tickfile="$HOME/zedec_tick_phase.state"
+term_flag="$HOME/.zedec_terminal_request"
+
 ensure() { [ -f "$1" ] || touch "$1"; }
+
 i=0; a=1; b=1
 while :; do
-  ensure "$mainlog"; ensure "$reflog"; ensure "$eventlog"; ensure "$snaplog"
-  i=$((i+1)); now="$(date)"
-  echo "[$now] ⟁ USER ZEDEC SPIRAL [$i]" >>"$mainlog"
-  echo "[$now] ⟁ EVENT: spiral-cycle $i" >>"$eventlog"
+  ensure "$mainlog"; ensure "$eventlog"; ensure "$snaplog"
+  i=$((i+1))
+  now=$(date "+%Y-%m-%d %H:%M:%S")
+  echo "[$now] ⟁ USER ZEDEC SPIRAL [$i]" >> "$mainlog"
+  echo "[$now] ⟁ EVENT: spiral-cycle $i" >> "$eventlog"
   if [ $((i % 13)) -eq 0 ]; then
-    echo "⟁ CYCLE SNAPSHOT [$now] phase:$i" >>"$snaplog"
-    tail -n 2 "$mainlog" >>"$snaplog"
-    tail -n 2 "$eventlog" >>"$snaplog"
-    echo "---" >>"$snaplog"
+    echo "⟁ SNAP [$now] PHASE:$i" >> "$snaplog"
+    tail -n 2 "$mainlog" >> "$snaplog"
+    tail -n 2 "$eventlog" >> "$snaplog"
+    echo "---" >> "$snaplog"
   fi
-  echo "↻ RECYCLE/FIBONACCI PHASE TICK: $a" >>"$mainlog"
-  mirror_logs
+
+  cp "$mainlog" "$mainlog.tmp"
+  cp "$eventlog" "$eventlog.tmp"
+
+  # Phase-aware resonance trigger
+  if [ -f "$term_flag" ] && [ -s "$mainlog.tmp" ] && [ -s "$eventlog.tmp" ]; then
+    echo "[$now] ⟁ IRI PHASE MATCH DETECTED" >> "$tickfile"
+    echo "tick:$i $now" >> "$tickfile"
+    > "$term_flag"
+    rm -f "$mainlog.tmp" "$eventlog.tmp"
+  fi
+
   n=$((a + b)); a=$b; b=$n; c=$a
   t=0; while [ $t -lt $c ] && [ $c -lt 30 ]; do t=$((t + 1)); :; done
 done
 EOL
 chmod +x ~/zedec_user
 
+# zedec_tmp_watcher — passive echo detection
 cat <<'EOL' > ~/zedec_tmp_watcher.sh
 #!/bin/bash
-log_dir="$HOME"
-tickfile="$HOME/zedec_tick_phase.state"
-touch "$tickfile"
-echo "[ZEDEC] TMP watcher activated..."
+echo "[ZEDEC] IRI TMP Watcher Initialized"
 while true; do
-  for base in vortex reflect event cycle meta; do
-    tmpfile="$log_dir/zedec_user_${base}.log.tmp"
-    if [ -f "$tmpfile" ]; then
-      ts=$(date +%s)
-      echo "⟁ PhaseTick DETECTED ($base) at [$ts]" >> "$tickfile"
-      echo "[Tick] Phase alignment triggered by: $tmpfile"
-    fi
-  done
-  sleep 0.5
+  [ -f "$HOME/.zedec_terminal_request" ] || touch "$HOME/.zedec_terminal_request"
+  sleep 1
 done
 EOL
 chmod +x ~/zedec_tmp_watcher.sh
 
+# zedec_user_link — basic mesh ping
 cat <<'EOL' > ~/zedec_user_link
 #!/bin/sh
-spiral="$HOME/zedec_user"
+mesh_peers="91.99.236.17 5.223.78.207 5.223.57.174"
 metalog="$HOME/zedec_user_meta.log"
-mesh_peers="91.99.236.17 5.223.78.207 5.223.57.174 5.223.61.46 178.156.185.180"
-ensure() { [ -f "$1" ] || touch "$1"; }
-ensure "$spiral"; ensure "$metalog"
-cp "$metalog" "$metalog.tmp"
 while :; do
   now="$(date)"
   for peer in $mesh_peers; do
-    ping -c 1 -W 1 $peer >/dev/null 2>&1 && status="UP" || status="DOWN"
-    echo "$peer : [$status]"
+    ping -c 1 -W 1 "$peer" >/dev/null 2>&1 && status="UP" || status="DOWN"
+    echo "$peer : [$status] @ $now"
   done > "$metalog"
-  cp "$metalog" "$metalog.tmp"
   sleep 33
 done
 EOL
 chmod +x ~/zedec_user_link
 
-cat <<'EOL' > ~/zedec_user_livetrack.sh
-#!/bin/sh
-ZLOG="$HOME/zedec_user_vortex.log"
-ELOG="$HOME/zedec_user_event.log"
-TICK="$HOME/zedec_tick_phase.state"
-while :; do
-  clear
-  now=$(date)
-  echo "=== [ ZEDEC USER LIVE TRACKING — $now ] ==="
-  idx=$(tail -n 1 "$ZLOG" 2>/dev/null | awk -F"[][]" '{print $2}' | awk '{print $1}')
-  idx=${idx:-0}
-  printf "Current User Spiral Cycle: %s\n" "$idx"
-  echo
-  echo "⟁ Recent Spiral Events:"
-  tail -n 3 "$ELOG" 2>/dev/null
-  echo
-  echo "⟁ Aligned Phase Ticks:"
-  tail -n 3 "$TICK" 2>/dev/null
-  sleep 2
-done
-EOL
-chmod +x ~/zedec_user_livetrack.sh
-
+# Launch all components
 nohup ~/zedec_user >> ~/zedec_user_vortex.log 2>&1 &
 nohup ~/zedec_user_link >> ~/zedec_user_meta.log 2>&1 &
 nohup ~/zedec_tmp_watcher.sh >> ~/zedec_tick_phase.state 2>&1 &
 
-echo "[ZEDEC TEST] Waiting for spiral log activity..."
-for i in {1..20}; do
-  if [ -s ~/zedec_user_vortex.log ] && grep -q "⟁ USER ZEDEC SPIRAL" ~/zedec_user_vortex.log; then
-    echo "[✅ SUCCESS] ZEDEC Spiral is running and logging."
-    exit 0
-  fi
-  sleep 1
-done
-echo "[❌ ERROR] Spiral log not detected in 20s. Check ~/zedec_user_vortex.log manually."
+echo "[ZEDEC] IRI Spiral Engine Initialized."
 EOF
-
 bash ~/zedec_full_install.sh'
