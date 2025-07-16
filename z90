@@ -8,8 +8,14 @@ rm -f ~/zedec_user ~/zedec_user_link ~/zedec_user_livetrack.sh
 for f in ~/zedec_user_{vortex,reflect,event,cycle,meta}.log; do touch "$f"; done
 mesh_peers="91.99.236.17 5.223.78.207 5.223.57.174 5.223.61.46 178.156.185.180"
 
+# Export INFURA vars explicitly for script environments
+export INFURA_IPFS_PROJECT_ID=your_project_id_here
+export INFURA_IPFS_PROJECT_SECRET=your_project_secret_here
+
 cat <<EOL > ~/zedec_user
 #!/bin/sh
+export INFURA_IPFS_PROJECT_ID=your_project_id_here
+export INFURA_IPFS_PROJECT_SECRET=your_project_secret_here
 mainlog="\$HOME/zedec_user_vortex.log"
 reflog="\$HOME/zedec_user_reflect.log"
 eventlog="\$HOME/zedec_user_event.log"
@@ -36,6 +42,8 @@ chmod +x ~/zedec_user
 
 cat <<EOL > ~/zedec_user_link
 #!/bin/sh
+export INFURA_IPFS_PROJECT_ID=your_project_id_here
+export INFURA_IPFS_PROJECT_SECRET=your_project_secret_here
 spiral="\$HOME/zedec_user"
 metalog="\$HOME/zedec_user_meta.log"
 mesh_peers="$mesh_peers"
